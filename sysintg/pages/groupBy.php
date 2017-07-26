@@ -59,7 +59,7 @@
 				
 				// group by age only
 				if ($groupByAge && !$groupByUniversity) {
-					$tableTitle = "<center><b>Age:</b> $lowestAge to $highestAge<br><br></center>";
+					$tableTitle = "<center><b>Age:</b> $lowestAge to $highestAge<br><br></center><br>";
 					$groupByQuery =	$groupByQuery =	"Select studentID,lastName,firstName, FLOOR(DATEDIFF(NOW(),birthday) /365) as 'age', university  
 									 From
 									 (
@@ -77,24 +77,31 @@
 				}
 				// group by university only
 				else if (!$groupByAge && $groupByUniversity) {
-					$tableTitle = "<center>Students from <b>$university</b></center>";
+					
+					$universityString = "";
+					foreach ($_POST['university'] as $university){									
+						$universityString.= $university . ', ';
+					}					
+					$tableTitle = "<center>Students from <b>$universityString</b></center><br>";
+
+					$university = implode("','", $_POST['university']);
+					
 					$groupByQuery =	"Select studentID,lastName,firstName, FLOOR(DATEDIFF(NOW(),birthday) /365) as 'age', university  
-									 From
-									 (
-									   select
-										  studentID,
-										  firstName, 
-										  lastName,
-										  birthday,
-										  FLOOR(DATEDIFF(NOW(),birthday) /365) AS age,
-										  university
-									   from students   
-									 ) as innerTable
-									 Where university = '$university'";
+									   From students
+									  Where university in ('$university')";
 				}
 				// group by age and university
 				else if ($groupByAge && $groupByUniversity) {
-					$tableTitle = "<center> Students of <b>$lowestAge</b> to <b>$highestAge</b> years old from <b>$university</b></center>";
+					
+					$universityString = "";
+					foreach ($_POST['university'] as $university){									
+						$universityString.= $university . ', ';
+					}					
+					
+					$tableTitle = "<center> Students of <b>$lowestAge</b> to <b>$highestAge</b> years old from <b>$universityString</b></center><br>";
+					
+					$university = implode("','", $_POST['university']);
+					
 					$groupByQuery =	"Select studentID,lastName,firstName, FLOOR(DATEDIFF(NOW(),birthday) /365) as 'age', university  
 									 From
 									 (
@@ -109,7 +116,7 @@
 									 ) as innerTable
 									 Where age >= '$lowestAge' and
 										   age <= '$highestAge' and
-										   university = '$university'";
+										   university in ('$university') ";
 				}																		
 			}
 			else {
@@ -199,7 +206,12 @@
                         <li >
 							<a href="addStudents.php"><i class="fa fa-plus fa-fw"></i> Add Student</a>
 						</li>
-                
+						<li >
+							<a href="accounts.php"><i class="glyphicon glyphicon-user"></i> Accounts</a>
+						</li>
+						<li >
+							<a href="addAccount.php"><i class="	fa fa-user-plus"></i> Create New Account</a>
+						</li>
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
@@ -245,8 +257,8 @@
 							<form id="groupByForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">	
 								<div>
 									<b>Group By:</b>
-									<input type="checkbox" name="universityCheckbox" onclick="showUniversityDropdown('universityDropdown')" value="" <?php if (isset($_POST['university'])) echo $_POST['university']; ?>> University
-									<input type="checkbox" name="ageCheckbox" onclick="showAgeInput('ageInput')" <?php if (isset($_POST['age'])) echo $_POST['age']; ?>> Age
+									<input type="checkbox" name="universityCheckbox" onclick="showUniversityDropdown('universityDropdown')" value="" <?php if (isset($_POST['universityCheckbox'])) echo $_POST['universityCheckbox']; ?>> University
+									<input type="checkbox" name="ageCheckbox" onclick="showAgeInput('ageInput')" <?php if (isset($_POST['ageCheckbox'])) echo $_POST['ageCheckbox']; ?>> Age
 									<input type="submit" value="Submit"><br><br>
 								</div>
 								
@@ -257,7 +269,7 @@
 										    group by university";
 									$result = mysqli_query($dbc,$query);	
 					
-									echo "<select name='university' id='universityDropdown' style='display:none;'>";
+									echo "<select multiple size='8' name='university[]' id='universityDropdown' style='display:none;'>";
 
 									while ($row = $result->fetch_assoc()) {
 										unset($university);
