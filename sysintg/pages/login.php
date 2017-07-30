@@ -2,19 +2,50 @@
 	session_start();
 	require_once('studentDB_connect.php');
 	
-	if (isset($_POST['submit'])){
-		$message = null;
-		if ($_POST['username'] == "admin" && $_POST['password'] == "admin") {			
-			header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/students.php");
-			$_SESSION['authorized'] = true;
-			
-		}
+	if (isset($_POST['submit'])){	
+		$message=NULL;
+
+		if (empty($_POST['username'])){
+			 $_SESSION['username']=FALSE;
+		     $message.='You forgot to enter your username!';
+		} 
 		else {
-			$message = "Wrong username or password";
-			$_SESSION['authorized'] = false;
+		     $_SESSION['username']=$_POST['username']; 
+		}
+
+		if (empty($_POST['password'])){
+			 $_SESSION['password']=FALSE;
+			 $message.='You forgot to enter your password!';
+		} 
+		else {
+		     $_SESSION['password']=$_POST['password']; 		
+		}
+			
+		if(!isset($message)){
+		
+			$username = $_POST['username'];
+			$password = $_POST['password'];
+
+			$query_test="SELECT  *
+						   FROM accounts 
+						  WHERE username = '$username' AND password ='$password'";
+			$result=mysqli_query($dbc,$query_test);
+			
+			$count=mysqli_num_rows($result);
+			
+			if ($count == 1) {
+				$_SESSION['authorized'] = true;
+				$row = $result->fetch_assoc();
+				$_SESSION['accountID'] = $row['accountID'];
+				header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/students.php");
+			}
+			else {
+				$message = "Wrong username or password";
+				$_SESSION['authorized'] = false;
+			}
+								
 		}
 	}
-
 	if (isset($message)){
 		echo '<script type="text/javascript">alert("'.$message.'");</script>';
 	}
@@ -67,7 +98,7 @@
                         <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
                             <fieldset>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Username" name="username" type="username" value="<?php if (isset($_POST['username'])) echo $_POST['username']; ?>"/>
+                                    <input class="form-control" placeholder="Username" name="username" type="username" value="" <?php if (isset($_POST['username'])) echo $_POST['username']; ?>/>
                                 </div>
                                 <div class="form-group">
                                     <input class="form-control" placeholder="Password" name="password" type="password">

@@ -91,7 +91,12 @@
                         <li >
 							<a href="addStudents.php"><i class="fa fa-plus fa-fw"></i> Add Student</a>
 						</li>
-                
+						<li >
+							<a href="accounts.php"><i class="glyphicon glyphicon-user"></i> Accounts</a>
+						</li>
+						<li >
+							<a href="addAccount.php"><i class="	fa fa-user-plus"></i> Create New Account</a>
+						</li>
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
