@@ -6,14 +6,18 @@
 		header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/login.php");
 	}
 	
-	if (!empty($_GET['studentID'])) {
-		$_SESSION['tempStudentID'] = $_GET['studentID'];
+	if (!empty($_GET['accountID'])) {
+		$_SESSION['tempAccountID'] = $_GET['accountID'];
+		$accountID = $_SESSION['tempAccountID'];
 	}
-	$studentID = $_SESSION['tempStudentID'];	
+	else {
+		$accountID = $_SESSION['accountID'];
+	}
+		
 		
 	$query = "select *
-				from students
-				where studentID = '$studentID'";
+				from accounts
+				where accountID = '$accountID'";
 	$result=mysqli_query($dbc,$query); 
 	$row=mysqli_fetch_array($result,MYSQLI_ASSOC);
 
@@ -23,8 +27,8 @@
 		
 		$lastName = $_POST['lastName'];
 		$firstName = $_POST['firstName'];
-		$birthday = $_POST['birthday'];
-		$university = $_POST['university'];
+		$username = $_POST['username'];
+		$password = $_POST['password'];
 		
 		//error checks
 		if (empty($firstName) || is_numeric($firstName)){
@@ -35,33 +39,33 @@
 			$message.='<font color="red"><b>ERROR:</b></font> Invalid last name</b><br>';
 			$error=true;
 		}
-		if (empty($birthday) || is_numeric($birthday)){
-			$message.='<font color="red"><b>ERROR:</b></font> Enter birthday</b><br>';
+		if (empty($username) || is_numeric($username)){
+			$message.='<font color="red"><b>ERROR:</b></font> Enter username</b><br>';
 			$error=true;
 		}
-		if (empty($university) || is_numeric($university)){
-			$message.='<font color="red"><b>ERROR:</b></font> Enter University</b><br>';
+		if (empty($password) || is_numeric($password)){
+			$message.='<font color="red"><b>ERROR:</b></font> Enter Password</b><br>';
 			$error=true;
 		}
 	
 		if(!isset($message)){
 			
-			$update_query = "UPDATE students 
-				                SET lastName ='$lastName' ,
-									firstName ='$firstName' ,
-									birthday ='$birthday',
-									university = '$university'
-							  where studentID = '$studentID'";
+			$update_query = "UPDATE accounts 
+				                SET username ='$username' ,
+									password ='$password' ,
+									lastName ='$lastName',
+									firstName = '$firstName'
+							  where accountID = '$accountID'";
 			
 			if (mysqli_query($dbc, $update_query)) {
-				$message.= 'Successful editing the students information';					
+				$message.= 'Successful editing the account information';					
 			}
 			else {
-				$message.= 'Error editing the students information';	
+				$message.= 'Error editing the account information';	
 			}
 			$query = "select *
-				from students
-				where studentID = '$studentID'";
+				from accounts
+				where accountID = '$accountID'";
 			$result=mysqli_query($dbc,$query); 
 			$row=mysqli_fetch_array($result,MYSQLI_ASSOC);
 			
@@ -154,15 +158,12 @@
 						<li >
 							<a href="addStudents.php"><i class="fa fa-plus fa-fw"></i> Add Student</a>
 						</li>
-<<<<<<< HEAD
-=======
 						<li >
 							<a href="accounts.php"><i class="glyphicon glyphicon-user"></i> Accounts</a>
 						</li>
 						<li >
 							<a href="addAccount.php"><i class="	fa fa-user-plus"></i> Create New Account</a>
 						</li>
->>>>>>> sean
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
@@ -181,15 +182,8 @@
 			
 					<ol class="breadcrumb">
 						<li>
-							<i class="fa  fa-users fa-fw"></i>  <a href="students.php">Students</a>
-						</li>
-						<li >
-							<i class="fa fa-plus fa-fw"></i>  <a href="numberOfStudentsPerUniversity.php">University</a>
-						</li>
-						<li class="active">
-							<i class="fa fa-plus fa-fw"></i>  <a href="groupBy.php">Group by University and Age</a>
-						</li>
-						
+							<i class="glyphicon glyphicon-user"></i><a href="accounts.php"> Accounts</a>
+						</li>						
                     </ol>
                 </div>
                 <!-- /.col-lg-12 -->
@@ -210,13 +204,13 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<i class="fa fa-user fa-fw"></i> Student Information Form
+							<i class="fa fa-user fa-fw"></i> Account Information Form
 						</div>
 						
 						<!-- /.panel-heading -->
 						<div class="panel-body" size>
 							
-							<fieldset><legend>Student Information</legend>
+							<fieldset><legend>Account Information</legend>
 							<p>							
 							</fieldset>
 													
@@ -234,13 +228,13 @@
 							     </div>
 							  
 								 <div class="form-group">
-									 <label>Birthday</label>
-									 <input type="date" class="form-control" name="birthday" placeholder="Birthday" value="<?php echo $row['birthday'];?>" required>
+									 <label>Username</label>
+									 <input type="text" class="form-control" name="username" placeholder="Username" value="<?php echo $row['username'];?>" required>
 								 </div>
 								 
 								 <div class="form-group">
-								     <label>University</label>
-								     <input type="text" name="university" class="form-control" placeholder="University" value="<?php echo $row['university'];?>" required>	
+								     <label>Password</label>
+								     <input type="password" name="password" class="form-control" placeholder="Password" value="<?php echo $row['password'];?>" required>	
 							     </div>
 						
 								 <div align="center">
